@@ -6,35 +6,53 @@ __lua__
 
 function _init()
 	make_player()
+	gravity = 0.009
+	friction = 1.01
+	debug = ""
 end
 
 function _update60()
 	move_player()
+	
+
 end
 
 function _draw()
 	cls()
 	spr(1,p.x,p.y)
+	print(debug)
 end
 
 function make_player()
 	p = {}
 	p.x = 10
 	p.y = 20
+	p.dx = 0
+	p.dy = 0
 end
 -->8
 -- updatefunctions
 
 function move_player()
-	if btn(0) then
-		p.x -= 1
-	elseif btn(1) then
-		p.x += 1
-	elseif btn(2) then
-		p.y -= 1
-	elseif btn(3) then
-		p.y += 1	
+	if btn(0) then	p.dx = -0.5 end
+	if btn(1) then	p.dx = 0.5 end
+	if btn(2) then	p.dy = -0.5 end
+	if btn(3) then	p.dy = 0.5	end
+
+	
+	p.dy = p.dy+gravity
+	p.dx = p.dx/friction
+
+	p.x += p.dx
+	p.y += p.dy
+	
+	if p.y > 95 then
+		p.dx = 0
 	end
+	
+	p.x = mid(5,p.x,100)
+	p.y = mid(5,p.y,100)
+	debug = p.dx
 end
 __gfx__
 00000000200660000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
