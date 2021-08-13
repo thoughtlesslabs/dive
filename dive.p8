@@ -5,14 +5,37 @@ __lua__
 -- a thoughtless labs experiment
 
 function _init()
+	make_player()
 end
 
 function _update60()
+	move_player()
 end
 
 function _draw()
+	cls()
+	spr(1,p.x,p.y)
 end
 
+function make_player()
+	p = {}
+	p.x = 10
+	p.y = 20
+end
+-->8
+-- updatefunctions
+
+function move_player()
+	if btn(0) then
+		p.x -= 1
+	elseif btn(1) then
+		p.x += 1
+	elseif btn(2) then
+		p.y -= 1
+	elseif btn(3) then
+		p.y += 1	
+	end
+end
 __gfx__
 00000000200660000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000209696000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
