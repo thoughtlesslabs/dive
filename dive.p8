@@ -6,6 +6,7 @@ __lua__
 
 function _init()
 	make_player()
+	make_hose()
 	gravity = 0.009
 	friction = 1.01
 	debug = ""
@@ -13,13 +14,14 @@ end
 
 function _update60()
 	move_player()
-	
+	adjust_hose()
 
 end
 
 function _draw()
 	cls()
 	spr(1,p.x,p.y)
+	line(hose.x,hose.y,hose.x2,hose.y2,7)
 	print(debug)
 end
 
@@ -29,6 +31,14 @@ function make_player()
 	p.y = 20
 	p.dx = 0
 	p.dy = 0
+end
+
+function make_hose()
+	hose = {}
+	hose.x = 0
+	hose.y = 0
+	hose.x2 = 0
+	hose.y2 = 0
 end
 -->8
 -- updatefunctions
@@ -53,6 +63,12 @@ function move_player()
 	p.x = mid(5,p.x,100)
 	p.y = mid(5,p.y,100)
 	debug = p.dx
+end
+
+
+function adjust_hose()
+	hose.x = p.x
+	hose.y = p.y
 end
 __gfx__
 00000000200660000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
