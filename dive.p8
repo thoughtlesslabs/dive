@@ -7,8 +7,9 @@ __lua__
 function _init()
 	make_player()
 	make_hose()
-	gravity = 0.009
+	gravity = 0.01
 	friction = 1.01
+	cooldown = 10
 	debug = ""
 end
 
@@ -44,11 +45,16 @@ end
 -- updatefunctions
 
 function move_player()
+	if cooldown <= 0 then
 	if btn(0) then	p.dx = -0.5 end
 	if btn(1) then	p.dx = 0.5 end
 	if btn(2) then	p.dy = -0.5 end
 	if btn(3) then	p.dy = 0.5	end
-
+	cooldown = 10
+	end
+	
+	cooldown -= 1
+	
 	
 	p.dy = p.dy+gravity
 	p.dx = p.dx/friction
