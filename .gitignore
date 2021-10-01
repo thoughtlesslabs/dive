@@ -1,3 +1,6 @@
 # Ignore all hidden directories and files
 .*
 !.gitignore
+
+# Ignore test code files
+ropetest.p8
