@@ -1,88 +1,85 @@
 pico-8 cartridge // http://www.pico-8.com
-version 32
+version 33
 __lua__
 function _init()
 	rope = {}
-	start = {}
-	ending = {}
-	rope_length = 30
-	create_rope()
-end
-
-function create_rope()
-	for i=1,rope_length do
-		if i == 1 then 
-			startpoint = true
-		elseif i == rope_length then
-			endpoint = true
-		else
-			startpoint = false
-			endpoint = false
-		end
-		addsegment(10+i,10,startpoint,endpoint,i)
+	rope_segments = 10
+	rope_length = 1.5
+	mass = 2
+	damping = 3
+	tightness = 5
+	gravity = 0
+	rest_length = rope_length/rope_segments
+	for i=1,rope_segments do
+		x = 10 + rest_length*i
+		create_segment(x)
 	end
 end
 
 function _update60()
-	if #rope < rope_length-1 then
-		addsegment(ending[1].x,ending[1].y,false,false,ending[1].pos)
-	end
-	if #rope > rope_length-1 then
-		del(rope,rope[#rope])
+	if btnp(0) then
+		rope[#rope-1].x += 5
 	end
 	
-	if btn(1) then
-		ending[1].x += 1
-		rope_length +=1
-	end
-	if btn(0) then
-		ending[1].x -= 1
-		rope_length -=1
-	end
-	
-	for i=1,#rope do
-		r = rope[i]
-		r.dy = r.dy+0.2
+	for i=1, #rope-1 do
+		r1 = rope[i]
+		r2 = rope[i+1]
+		dx = r2.x-r1.x
+		dy = r2.y-r1.y
+		spring_length = sqrt(dx*dx-dy*dy)
+		normx = dx/spring_length
+		normy = dy/spring_length
 		
-		if r.pos - 1 == start[1].pos 
-		or r.pos + 1 == ending[1].pos then
-			r.dy = 0
-		else
-			r.dy /=5
-		end
-		r.y += r.dy
-	end
-
+		velx = r2.vx-r1.vx
+		vely = r2.vy-r1.vy
+		
+		force = -tightness*(spring_length-rest_length)
+		force -= damping*((dx*velx+dy*vely)/spring_length)
 	
-end
+		r1.forcex -= force*normx
+		r1.forcey -= force*normy
+		r2.forcex += force*normx
+		r2.forcey += force*normy
 
-function addsegment(x,y,sp,ep,pos)
-	p ={}
-	p.x = x
-	p.y = y
-	p.dx = 0
-	p.dy = 0
-	p.sp = sp
-	p.ep = ep
-	p.pos = pos
-	if p.sp then
-		add(start,p)
-	elseif p.ep then
-		add(ending,p)
-	else
-		add(rope,p)
+	end
+	for i=1,#rope do
+		rx = rope[i]
+		accx = rx.forcex/rx.mass
+		accy = rx.forcey/rx.mass
+		
+		accy += gravity
+		
+		velx += accx
+		vely += accy
+		
+		rx.x += velx
+		rx.y += vely
+		
+		rx.forcex = 0
+		rx.forcey = 0
 	end
 end
 
 function _draw()
 	cls()
-	for i=1,#rope do
-		pset(rope[i].x,rope[i].y,2)
+	local rs1,rs2
+	for i=1,#rope-1 do
+		rs1 = rope[i]
+		rs2 = rope[i+1]
+		line(rs1.x,rs1.y,rs2.x,rs2.y)
 	end
-	pset(start[1].x,start[1].y,3)
-	pset(ending[1].x,ending[1].y,3)
-	print(#rope)
-	print(rope_length)
+end
+
+function create_segment(x)
+	r = {}
+	r.mass = mass
+	r.x = x
+	r.y = 10
+	r.vx = 0
+	r.vy = 0
+	r.forcex =0
+	r.forcey =0
+	add(rope,r)
 end
 __gfx__
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000

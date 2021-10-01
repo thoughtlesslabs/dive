@@ -6,31 +6,36 @@ __lua__
 
 function _init()
 	full_rope={}
+	spring_rest = 5
 	for i=1, 10 do
-		rope_ep1 = 5*i
+		rope_ep1 = spring_rest*i
 		add_rope_segment(rope_ep1)
 	end
 end
 
 function _update60()
 	if btnp(0) then
-			full_rope[1].ep2 += 10
+		for i=1,#full_rope do
+			full_rope[#full_rope].ep2 += 1
+	end
 	end
 	
 	for i=1,#full_rope do
 		rs = full_rope[i]
 		
 		spring_length = rs.ep2 - rs.ep1
-		force = -rs.tightness*(spring_length-rs.spring_rest) - rs.dampen*(rs.velocity2-rs.velocity1)
+		velx = rs.velocity2-rs.velocity1
 		
-		rs.accel1 = -force / rs.ep1_mass
-		rs.accel2 = force / rs.ep2_mass
+		force = -rs.tightness*(spring_length-spring_rest) - rs.dampen*(rs.velocity2-rs.velocity1)
 		
-		rs.velocity1 += rs.accel1
-		rs.velocity2 += rs.accel2
+		accel = force / rs.ep2_mass
 		
-		rs.ep1 += rs.velocity1
-		rs.ep2 += rs.velocity2
+		accel += 1.5
+		
+		velx += accel
+			
+		rs.ep2 += velx
+
 	end
 end
 
@@ -45,13 +50,12 @@ end
 function add_rope_segment(x)
 	rope = {}
 	rope.dampen = 2
-	rope.spring_rest = 5
-	rope.tightness = 2
-	rope.ep1_mass = 10
-	rope.ep2_mass = 10
+	rope.tightness = 0.5
+	rope.ep1_mass = 100
+	rope.ep2_mass = 5
 	rope.velocity1 = 0
 	rope.velocity2 = 0
 	rope.ep1 = x
-	rope.ep2 = rope.ep1 + rope.spring_rest
+	rope.ep2 = rope.ep1 + spring_rest
 	add(full_rope,rope)
 end
